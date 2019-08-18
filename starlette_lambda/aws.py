@@ -17,20 +17,10 @@ class LambdaFunction:
         loop.create_task(lifespan.run())
         loop.run_until_complete(lifespan.wait_startup())
 
-        connection_scope = {
-            'type': 'http',
-            'http_version': '1.1',
-            'scheme': 'http',
-            'method': event['httpMethod'],
-            'root_path': '',
-            'path': event['path'],
-            'query_string': urllib.parse.urlencode(event['queryStringParameters']),
-            'headers': event['headers'].items(),
-            'x-aws-lambda': {
-                'requestContext': event['requestContext'],
-                'lambdaContext': context
-            }
-        }
+        connection_scope = self.get_connection_scope(
+            event=event,
+            context=context
+        )
 
         async def _receive() -> Message:
             body = event['body']
@@ -57,3 +47,20 @@ class LambdaFunction:
         loop.run_until_complete(lifespan.wait_shutdown())
 
         return response
+
+    def get_connection_scope(self, event, context):
+        return {
+            'type': 'http',
+            'http_version': '1.1',
+            'scheme': 'http',
+            'method': event['httpMethod'],
+            'root_path': '',
+            'path': event['path'],
+            'query_string': urllib.parse.urlencode(
+                event['queryStringParameters']),
+            'headers': event['headers'].items(),
+            'x-aws-lambda': {
+                'requestContext': event['requestContext'],
+                'lambdaContext': context
+            }
+        }
