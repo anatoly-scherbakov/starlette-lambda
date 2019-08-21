@@ -11,7 +11,6 @@ def test_values_missing():
 
     assert query_string == ''
 
-
 def test_multi_value():
     query_string = LambdaFunction(asgi=Starlette()).get_query_string(event={
         'queryStringParameters': {'make': 'TOYOTA', 'zip_code': '65301'},
